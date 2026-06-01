@@ -1,0 +1,9 @@
+{
+  "name": "epimap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "King County epidemiology direction explorer using CDC PLACES data.",
+  "scripts": {
+    "serve": "python3 -m http.server 8080"
+  }
+}

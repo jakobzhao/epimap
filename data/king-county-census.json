@@ -1,0 +1,11 @@
+{
+  "source": "Census Reporter latest ACS 5-year tables B01003, B17001, B15003, B08303",
+  "source_url": "https://api.censusreporter.org/1.0/data/show/latest?geo_ids=05000US53033&table_ids=B01003,B17001,B15003,B08303",
+  "retrieved_at": "2026-06-01",
+  "name": "King County, WA",
+  "geo_id": "05000US53033",
+  "population": 2287171,
+  "poverty_pct": 8.6,
+  "less_than_high_school_pct": 6.2,
+  "commute_45min_plus_pct": 21.0
+}
