@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EpiMap | King County Epidemiology Explorer</title>
+  <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     :root {
       --bg: #f6f8f8;
@@ -306,6 +307,48 @@
 
     .value { font-weight: 850; text-align: right; color: var(--teal-dark); }
 
+    #map {
+      width: 100%;
+      height: 332px;
+    }
+
+    .map-legend {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 2;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      width: min(260px, calc(100% - 24px));
+      box-shadow: 0 8px 24px rgba(18, 37, 40, .08);
+    }
+
+    .legend-ramp {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #dcefed, #80cbc2, #0f766e, #134e4a);
+      border: 1px solid rgba(19, 78, 74, .14);
+      margin: 7px 0 5px;
+    }
+
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .maplibregl-popup-content {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      font: 12px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+    }
+
     .metric {
       border: 1px solid var(--line);
       background: #f8fbfb;
@@ -479,8 +522,13 @@
             <div class="panel-body">
               <div class="chart-grid">
                 <div class="chart-box">
-                  <div class="chart-title">WA 县级排行榜</div>
-                  <div id="countyList" class="county-list"></div>
+                  <div class="chart-title" id="mapTitle">MapLibre 县级专题图</div>
+                  <div id="map"></div>
+                  <div class="map-legend">
+                    <div class="small" id="legendTitle"></div>
+                    <div class="legend-ramp"></div>
+                    <div class="legend-labels"><span id="legendMin"></span><span id="legendMax"></span></div>
+                  </div>
                 </div>
                 <div class="chart-box">
                   <div class="chart-title" id="scatterTitle"></div>
@@ -539,6 +587,8 @@
   </div>
   <div id="toast" class="toast">已复制</div>
   <script src="./data/king-wa-data.js"></script>
+  <script src="./data/wa-counties-2023.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
   <script src="./src/app.js"></script>
 </body>
 </html>

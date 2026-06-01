@@ -123,6 +123,9 @@ let state = {
 };
 
 const $ = (id) => document.getElementById(id);
+let map;
+let mapLoaded = false;
+let popup;
 
 function icon(type) {
   const common = 'stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"';
@@ -194,27 +197,128 @@ function renderSelects() {
   $("exposureSelect").onchange = (event) => { state.exposure = event.target.value; render(); };
 }
 
-function renderCountyList() {
-  const sorted = rows.slice().sort((a, b) => b[state.outcome] - a[state.outcome]);
-  const max = Math.max(...sorted.map(r => r[state.outcome]));
-  const min = Math.min(...sorted.map(r => r[state.outcome]));
-  $("countyList").innerHTML = sorted.map(row => {
-    const pct = ((row[state.outcome] - min) / (max - min || 1)) * 100;
-    const active = row.countyfips === state.selectedFips ? "selected" : "";
-    return `
-      <button class="county-row ${active}" type="button" data-fips="${row.countyfips}">
-        <strong>${row.countyname}</strong>
-        <span class="bar"><span style="width:${pct}%"></span></span>
-        <span class="value">${fmt(row[state.outcome])}</span>
-      </button>
-    `;
-  }).join("");
-  document.querySelectorAll(".county-row").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.selectedFips = btn.dataset.fips;
-      render();
-    });
+function mapData() {
+  const byFips = new Map(rows.map(row => [row.countyfips, row]));
+  return {
+    ...window.WA_COUNTIES_GEOJSON,
+    features: window.WA_COUNTIES_GEOJSON.features.map(feature => {
+      const row = byFips.get(feature.properties.GEOID);
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          value: row ? row[state.outcome] : null,
+          exposure: row ? row[state.exposure] : null,
+          selected: feature.properties.GEOID === state.selectedFips,
+          isKing: feature.properties.GEOID === KING_FIPS
+        }
+      };
+    })
+  };
+}
+
+function mapBreaks() {
+  const values = rows.map(row => row[state.outcome]).filter(Number.isFinite);
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
+
+function initMap() {
+  if (map || !window.maplibregl) return;
+  map = new maplibregl.Map({
+    container: "map",
+    style: {
+      version: 8,
+      sources: {
+        osm: {
+          type: "raster",
+          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+          tileSize: 256,
+          attribution: "© OpenStreetMap contributors"
+        }
+      },
+      layers: [{ id: "osm", type: "raster", source: "osm" }]
+    },
+    center: [-120.8, 47.35],
+    zoom: 5.55,
+    minZoom: 4.6,
+    maxZoom: 9,
+    cooperativeGestures: true
   });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+  popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false });
+  map.on("load", () => {
+    mapLoaded = true;
+    const breaks = mapBreaks();
+    map.addSource("wa-counties", { type: "geojson", data: mapData() });
+    map.addLayer({
+      id: "county-fill",
+      type: "fill",
+      source: "wa-counties",
+      paint: {
+        "fill-color": ["case",
+          ["==", ["get", "selected"], true], "#d99116",
+          ["interpolate", ["linear"], ["get", "value"],
+            breaks.min, "#dcefed",
+            (breaks.min + breaks.max) / 2, "#0f766e",
+            breaks.max, "#134e4a"
+          ]
+        ],
+        "fill-opacity": ["case", ["==", ["get", "selected"], true], 0.88, 0.68]
+      }
+    });
+    map.addLayer({
+      id: "county-line",
+      type: "line",
+      source: "wa-counties",
+      paint: {
+        "line-color": ["case", ["==", ["get", "selected"], true], "#8a520b", ["==", ["get", "isKing"], true], "#ba5656", "#ffffff"],
+        "line-width": ["case", ["==", ["get", "selected"], true], 2.5, ["==", ["get", "isKing"], true], 2, 0.8]
+      }
+    });
+    map.on("mousemove", "county-fill", event => {
+      map.getCanvas().style.cursor = "pointer";
+      const feature = event.features && event.features[0];
+      if (!feature) return;
+      const value = feature.properties.value;
+      const exposure = feature.properties.exposure;
+      popup
+        .setLngLat(event.lngLat)
+        .setHTML(`<strong>${feature.properties.NAMELSAD}</strong><br>${measures[state.outcome]}: ${fmt(Number(value))}%<br>${measures[state.exposure]}: ${fmt(Number(exposure))}%`)
+        .addTo(map);
+    });
+    map.on("mouseleave", "county-fill", () => {
+      map.getCanvas().style.cursor = "";
+      popup.remove();
+    });
+    map.on("click", "county-fill", event => {
+      const feature = event.features && event.features[0];
+      if (feature) {
+        state.selectedFips = feature.properties.GEOID;
+        render();
+      }
+    });
+    updateMap();
+  });
+}
+
+function updateMap() {
+  const values = rows.map(row => row[state.outcome]).filter(Number.isFinite);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  $("mapTitle").textContent = `MapLibre: ${measures[state.outcome]}`;
+  $("legendTitle").textContent = measures[state.outcome];
+  $("legendMin").textContent = `${fmt(min)}%`;
+  $("legendMax").textContent = `${fmt(max)}%`;
+  if (!mapLoaded) return;
+  map.getSource("wa-counties").setData(mapData());
+  map.setPaintProperty("county-fill", "fill-color", ["case",
+    ["==", ["get", "selected"], true], "#d99116",
+    ["interpolate", ["linear"], ["get", "value"],
+      min, "#dcefed",
+      (min + max) / 2, "#0f766e",
+      max, "#134e4a"
+    ]
+  ]);
 }
 
 function renderScatter() {
@@ -323,7 +427,8 @@ function render() {
   $("dataBadge").textContent = state.direction.badge;
   $("hypothesis").textContent = `假设：在 Washington 县级尺度上，${measures[state.exposure]} 较高的县，可能也会出现较高的 ${measures[state.outcome]}。King County 可作为重点案例解释。`;
   $("tags").innerHTML = state.direction.tags.map(tag => `<span class="tag">${tag}</span>`).join("");
-  renderCountyList();
+  initMap();
+  updateMap();
   renderScatter();
   renderMetrics();
   renderInterpretation();
