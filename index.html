@@ -395,20 +395,31 @@
 
     .welcome-panel {
       position: absolute;
-      left: 18px;
-      top: 66px;
+      left: 50%;
+      top: 50%;
       z-index: 3;
-      width: min(720px, calc(100% - 96px));
-      max-height: calc(100% - 132px);
+      width: min(760px, calc(100% - 80px));
+      max-height: min(760px, calc(100% - 80px));
       overflow: auto;
       border: 1px solid rgba(23, 25, 29, 0.15);
       border-radius: 6px;
-      background: rgba(251, 250, 246, 0.94);
+      background: rgba(251, 250, 246, 0.97);
       box-shadow: var(--shadow);
       padding: 18px 18px 16px;
+      transform: translate(-50%, -50%);
     }
 
     .welcome-panel[hidden] { display: none; }
+
+    .welcome-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: rgba(23, 25, 29, 0.34);
+      backdrop-filter: grayscale(1) brightness(0.82);
+    }
+
+    .welcome-backdrop[hidden] { display: none; }
 
     .welcome-head {
       display: flex;
@@ -542,10 +553,8 @@
       .map-toolbar { top: 12px; right: 52px; }
       .map-caption { display: none; }
       .welcome-panel {
-        left: 14px;
-        top: 62px;
         width: calc(100% - 28px);
-        max-height: calc(100% - 88px);
+        max-height: calc(100% - 64px);
         padding: 15px;
       }
       .welcome-grid { grid-template-columns: 1fr; }
@@ -650,6 +659,7 @@
         <button type="button" id="resetView">Reset</button>
         <button type="button" id="toggleBorders" aria-pressed="true">Borders</button>
       </div>
+      <div class="welcome-backdrop" id="welcomeBackdrop"></div>
       <section class="welcome-panel" id="welcomePanel" aria-label="Welcome panel">
         <div class="welcome-head">
           <div>

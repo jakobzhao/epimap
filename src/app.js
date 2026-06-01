@@ -494,10 +494,17 @@ $("toggleBorders").addEventListener("click", event => {
 
 $("welcomeClose").addEventListener("click", () => {
   $("welcomePanel").hidden = true;
+  $("welcomeBackdrop").hidden = true;
 });
 
 $("welcomeBtn").addEventListener("click", () => {
   $("welcomePanel").hidden = false;
+  $("welcomeBackdrop").hidden = false;
+});
+
+$("welcomeBackdrop").addEventListener("click", () => {
+  $("welcomePanel").hidden = true;
+  $("welcomeBackdrop").hidden = true;
 });
 
 state.selectedTract = topTract(state.outcome).tractfips;
