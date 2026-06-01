@@ -394,10 +394,10 @@
     }
 
     .welcome-panel {
-      position: absolute;
+      position: fixed;
       left: 50%;
       top: 50%;
-      z-index: 3;
+      z-index: 21;
       width: min(760px, calc(100% - 80px));
       max-height: min(760px, calc(100% - 80px));
       overflow: auto;
@@ -412,9 +412,9 @@
     .welcome-panel[hidden] { display: none; }
 
     .welcome-backdrop {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 2;
+      z-index: 20;
       background: rgba(23, 25, 29, 0.34);
       backdrop-filter: grayscale(1) brightness(0.82);
     }
