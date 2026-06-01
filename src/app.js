@@ -260,11 +260,24 @@ function initMap() {
     container: "map",
     style: {
       version: 8,
-      sources: {},
+      sources: {
+        carto: {
+          type: "raster",
+          tiles: [
+            "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+            "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+            "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+            "https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+          ],
+          tileSize: 256,
+          attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+        }
+      },
       layers: [{
-        id: "background",
-        type: "background",
-        paint: { "background-color": "#e4e7e8" }
+        id: "carto-positron",
+        type: "raster",
+        source: "carto",
+        paint: { "raster-opacity": 0.78 }
       }]
     },
     center: [-122.19, 47.48],
@@ -284,7 +297,7 @@ function initMap() {
       source: "king-tracts",
       paint: {
         "fill-color": "#0f766e",
-        "fill-opacity": ["case", ["==", ["get", "selected"], true], 0.9, 0.68]
+        "fill-opacity": ["case", ["==", ["get", "selected"], true], 0.86, 0.58]
       }
     });
     map.addLayer({
