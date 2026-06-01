@@ -126,6 +126,7 @@ const $ = (id) => document.getElementById(id);
 let map;
 let mapLoaded = false;
 let popup;
+let bordersVisible = true;
 
 function icon(type) {
   const common = 'stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"';
@@ -185,9 +186,22 @@ function topTract(key) {
   return rows.slice().sort((a, b) => b[key] - a[key])[0];
 }
 
+function geoBounds(geojson) {
+  const bounds = new maplibregl.LngLatBounds();
+  const extendCoords = coords => {
+    if (typeof coords[0] === "number") {
+      bounds.extend(coords);
+      return;
+    }
+    coords.forEach(extendCoords);
+  };
+  geojson.features.forEach(feature => extendCoords(feature.geometry.coordinates));
+  return bounds;
+}
+
 function renderNav() {
   $("directionList").innerHTML = directions.map(d => `
-    <button class="direction ${d.id === state.direction.id ? "active" : ""}" data-id="${d.id}" type="button">
+    <button class="direction ${d.id === state.direction.id ? "active" : ""}" data-id="${d.id}" type="button" aria-pressed="${d.id === state.direction.id}">
       ${icon(d.icon)}
       <span><strong>${d.name}</strong><span>${d.short}</span></span>
     </button>
@@ -246,19 +260,16 @@ function initMap() {
     container: "map",
     style: {
       version: 8,
-      sources: {
-        osm: {
-          type: "raster",
-          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-          tileSize: 256,
-          attribution: "© OpenStreetMap contributors"
-        }
-      },
-      layers: [{ id: "osm", type: "raster", source: "osm" }]
+      sources: {},
+      layers: [{
+        id: "background",
+        type: "background",
+        paint: { "background-color": "#e4e7e8" }
+      }]
     },
     center: [-122.19, 47.48],
-    zoom: 8.15,
-    minZoom: 7.25,
+    zoom: 8.2,
+    minZoom: 7,
     maxZoom: 12,
     cooperativeGestures: true
   });
@@ -281,10 +292,11 @@ function initMap() {
       type: "line",
       source: "king-tracts",
       paint: {
-        "line-color": ["case", ["==", ["get", "selected"], true], "#8a520b", "#ffffff"],
-        "line-width": ["case", ["==", ["get", "selected"], true], 2.3, 0.55]
+        "line-color": ["case", ["==", ["get", "selected"], true], "#7b5c3d", "rgba(255,255,255,0.8)"],
+        "line-width": ["case", ["==", ["get", "selected"], true], 2.2, 0.5]
       }
     });
+    map.fitBounds(geoBounds(window.KING_TRACTS_GEOJSON), { padding: 44, duration: 0 });
     map.on("mousemove", "tract-fill", event => {
       map.getCanvas().style.cursor = "pointer";
       const feature = event.features && event.features[0];
@@ -313,18 +325,17 @@ function updateMap() {
   const values = rows.map(row => row[state.outcome]).filter(Number.isFinite);
   const min = Math.min(...values);
   const max = Math.max(...values);
-  $("mapTitle").textContent = `MapLibre: ${measures[state.outcome]}`;
   $("legendTitle").textContent = measures[state.outcome];
   $("legendMin").textContent = `${fmt(min)}%`;
   $("legendMax").textContent = `${fmt(max)}%`;
   if (!mapLoaded) return;
   map.getSource("king-tracts").setData(mapData());
   map.setPaintProperty("tract-fill", "fill-color", ["case",
-    ["==", ["get", "selected"], true], "#d99116",
+    ["==", ["get", "selected"], true], "#b9781f",
     ["interpolate", ["linear"], ["get", "value"],
       min, "#dcefed",
-      (min + max) / 2, "#0f766e",
-      max, "#134e4a"
+      (min + max) / 2, "#5f989a",
+      max, "#275f68"
     ]
   ]);
 }
@@ -454,6 +465,18 @@ $("copyBtn").addEventListener("click", async () => {
   }
   $("toast").classList.add("show");
   window.setTimeout(() => $("toast").classList.remove("show"), 1400);
+});
+
+$("resetView").addEventListener("click", () => {
+  if (!mapLoaded) return;
+  map.fitBounds(geoBounds(window.KING_TRACTS_GEOJSON), { padding: 44, duration: 450 });
+});
+
+$("toggleBorders").addEventListener("click", event => {
+  if (!mapLoaded) return;
+  bordersVisible = !bordersVisible;
+  map.setLayoutProperty("tract-line", "visibility", bordersVisible ? "visible" : "none");
+  event.currentTarget.setAttribute("aria-pressed", String(bordersVisible));
 });
 
 state.selectedTract = topTract(state.outcome).tractfips;

@@ -7,585 +7,551 @@
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f6f8f8;
-      --panel: #ffffff;
-      --soft: #eef5f4;
-      --text: #122528;
-      --muted: #617174;
-      --line: #d9e4e2;
-      --teal: #0f766e;
-      --teal-dark: #134e4a;
-      --blue: #3f6f9f;
-      --amber: #d99116;
-      --red: #ba5656;
-      --shadow: 0 18px 45px rgba(18, 37, 40, .08);
+      --ink: #17191d;
+      --muted: #606872;
+      --soft: #8a929b;
+      --line: #d6d1c7;
+      --panel: #f4f1ea;
+      --paper: #fbfaf6;
+      --field: #eee9df;
+      --map-bg: #e4e7e8;
+      --accent: #275f68;
+      --accent-2: #7b5c3d;
+      --focus: #1f5eff;
+      --shadow: 0 10px 28px rgba(23, 25, 29, 0.11);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: var(--bg);
     }
 
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: var(--bg); }
-    button, select, textarea { font: inherit; }
-    a { color: var(--teal-dark); text-decoration: none; font-weight: 800; }
-
-    .app {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 292px minmax(0, 1fr);
+    html, body { height: 100%; margin: 0; }
+    body {
+      color: var(--ink);
+      background: var(--panel);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
     }
 
-    .sidebar {
-      background: #fbfcfc;
-      border-right: 1px solid var(--line);
-      padding: 20px 16px;
-      position: sticky;
-      top: 0;
+    button, select, textarea { font: inherit; }
+    a { color: inherit; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: minmax(318px, 356px) 1fr;
       height: 100vh;
+      min-height: 660px;
+    }
+
+    .panel {
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       overflow: auto;
+      border-right: 1px solid rgba(23, 25, 29, 0.16);
+      background: var(--panel);
+      padding: 20px 20px 16px;
     }
 
     .brand {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(23, 25, 29, 0.18);
+      padding-bottom: 13px;
     }
 
-    .mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: var(--teal-dark);
-      color: white;
-      font-weight: 900;
-    }
+    h1, h2, p { margin-top: 0; }
 
-    h1, h2, p { margin: 0; }
-    h1 { font-size: 18px; line-height: 1.1; letter-spacing: 0; }
-    .small { color: var(--muted); font-size: 12px; line-height: 1.42; }
-    .nav-title { margin: 18px 4px 8px; font-size: 12px; color: var(--muted); font-weight: 820; }
-
-    .direction {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 30px 1fr;
-      gap: 10px;
-      text-align: left;
-      border: 1px solid transparent;
-      background: transparent;
-      border-radius: 8px;
-      padding: 11px 10px;
-      cursor: pointer;
-      margin: 3px 0;
-      color: var(--text);
-    }
-
-    .direction:hover { background: var(--soft); }
-    .direction.active { border-color: #b8ded8; background: #e3f3f0; }
-    .direction svg {
-      width: 30px;
-      height: 30px;
-      padding: 6px;
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 8px;
-      color: var(--teal-dark);
-    }
-
-    .direction strong {
-      display: block;
-      font-size: 13px;
-      line-height: 1.2;
-    }
-
-    .direction span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-      margin-top: 3px;
-    }
-
-    .side-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: white;
-      padding: 11px;
-      display: grid;
-      gap: 8px;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    main { padding: 22px; min-width: 0; }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 16px;
+    h1 {
+      margin: 0 0 9px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.38rem, 1.66vw, 1.72rem);
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: 0;
     }
 
     h2 {
-      font-size: 25px;
-      letter-spacing: 0;
-      line-height: 1.08;
-      margin-bottom: 6px;
+      margin: 0 0 6px;
+      color: #30343a;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.095em;
+      text-transform: uppercase;
     }
 
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .lede,
+    .source-note p,
+    .evidence li,
+    .small {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.33;
     }
 
-    .btn {
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--text);
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 780;
+    .lede { margin-bottom: 0; }
+
+    .control-group,
+    .question,
+    .evidence,
+    .legend-block,
+    .source-note,
+    .tract-stats,
+    .mini-chart,
+    .data-sources {
+      border-bottom: 1px solid rgba(23, 25, 29, 0.12);
+      padding-bottom: 10px;
     }
 
-    .btn.primary {
-      background: var(--teal-dark);
-      color: white;
-      border-color: var(--teal-dark);
-    }
-
-    .layout {
+    .segmented {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) 372px;
-      gap: 16px;
-      align-items: start;
+      gap: 4px;
     }
 
-    .stack { display: grid; gap: 16px; min-width: 0; }
-    .panel {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      min-width: 0;
+    .direction,
+    .map-toolbar button,
+    .copy-row button {
+      min-height: 34px;
+      border: 1px solid rgba(23, 25, 29, 0.14);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.78);
+      color: var(--ink);
+      cursor: pointer;
     }
 
-    .panel-head {
-      padding: 14px 15px 0;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
+    .direction {
+      width: 100%;
+      display: block;
+      min-height: 29px;
+      padding: 5px 8px;
+      color: #383d43;
+      font-size: 0.78rem;
+      text-align: left;
+      transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
     }
 
-    .panel-title {
-      font-size: 13px;
-      font-weight: 850;
-      line-height: 1.25;
+    .direction svg { display: none; }
+    .direction strong { display: block; font-weight: 500; }
+    .direction span span { display: none; }
+
+    .direction.active {
+      border-color: rgba(39, 95, 104, 0.52);
+      background: rgba(39, 95, 104, 0.1);
+      color: #153f46;
     }
 
-    .panel-body { padding: 14px 15px 15px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .question {
+      background: rgba(251, 250, 246, 0.62);
+      border: 1px solid rgba(23, 25, 29, 0.14);
+      border-radius: 4px;
+      padding: 9px 10px;
+    }
 
+    .question-label,
     label {
       display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 780;
       margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    #hypothesis {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 0.89rem;
+      line-height: 1.27;
     }
 
     select {
       width: 100%;
-      height: 38px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: white;
+      min-height: 32px;
+      border: 1px solid rgba(23, 25, 29, 0.16);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.85);
+      color: var(--ink);
       padding: 0 10px;
-      color: var(--text);
-      font-size: 13px;
+      font-size: 0.8rem;
     }
 
-    .hypothesis {
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--teal);
-      border-radius: 8px;
-      background: #f7fbfa;
-      padding: 12px;
-      font-size: 14px;
-      line-height: 1.55;
-      margin-top: 12px;
+    button:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(31, 94, 255, 0.28);
+      outline-offset: 2px;
     }
 
-    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-    .tag {
-      border: 1px solid #c7ddda;
-      background: #f5faf9;
-      color: var(--teal-dark);
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-weight: 780;
-    }
-
-    .chart-grid { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 12px; }
-    .chart-box {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      min-height: 332px;
-      background: linear-gradient(180deg, #fbfdfd, #f1f7f6);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .chart-title {
-      position: absolute;
-      left: 12px;
-      top: 10px;
-      font-size: 12px;
-      font-weight: 850;
-      color: var(--teal-dark);
-      z-index: 2;
-    }
-
-    svg { display: block; width: 100%; height: 100%; }
-
-    .county-list {
+    .tag-row {
       display: grid;
-      gap: 6px;
-      padding: 40px 12px 12px;
-      max-height: 332px;
-      overflow: auto;
-    }
-
-    .county-row {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 8px;
-      display: grid;
-      grid-template-columns: minmax(95px, 1fr) minmax(80px, 1fr) 48px;
-      gap: 8px;
-      align-items: center;
-      min-height: 31px;
-      padding: 5px 7px;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .county-row:hover, .county-row.selected {
-      outline: 2px solid var(--teal-dark);
-      outline-offset: 1px;
-    }
-
-    .bar {
-      height: 8px;
-      border-radius: 999px;
-      background: #dcefed;
-      overflow: hidden;
-      border: 1px solid rgba(19, 78, 74, .12);
-    }
-
-    .bar > span {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, #80cbc2, #0f766e, #134e4a);
-      width: 40%;
-    }
-
-    .value { font-weight: 850; text-align: right; color: var(--teal-dark); }
-
-    #map {
-      width: 100%;
-      height: 332px;
-    }
-
-    .map-legend {
-      position: absolute;
-      left: 12px;
-      bottom: 12px;
-      z-index: 2;
-      background: rgba(255, 255, 255, .92);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 9px 10px;
-      width: min(260px, calc(100% - 24px));
-      box-shadow: 0 8px 24px rgba(18, 37, 40, .08);
-    }
-
-    .legend-ramp {
-      height: 8px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #dcefed, #80cbc2, #0f766e, #134e4a);
-      border: 1px solid rgba(19, 78, 74, .14);
-      margin: 7px 0 5px;
-    }
-
-    .legend-labels {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .maplibregl-popup-content {
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      font: 12px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-    }
-
-    .metric {
-      border: 1px solid var(--line);
-      background: #f8fbfb;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 78px;
-    }
-
-    .metric-value {
-      font-size: 22px;
-      line-height: 1;
-      font-weight: 900;
-      color: var(--teal-dark);
-    }
-
-    .metric-label { margin-top: 6px; font-size: 12px; line-height: 1.35; color: var(--muted); }
-
-    .source-list, .next-list, .notes {
-      display: grid;
-      gap: 8px;
+      gap: 4px;
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
-    .source-list li, .next-list li, .notes li {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfdfd;
-      padding: 10px;
-      font-size: 13px;
-      line-height: 1.45;
+    .tag {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.33;
     }
 
-    .insight { position: sticky; top: 22px; }
-    textarea {
-      width: 100%;
-      min-height: 188px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 11px;
-      background: #fbfdfd;
-      color: var(--text);
-      font-size: 13px;
-      line-height: 1.5;
+    .tag::before {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      content: "";
+    }
+
+    .legend-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .legend-ramp {
+      height: 10px;
+      border: 1px solid rgba(23, 25, 29, 0.15);
+      border-radius: 999px;
+      background: linear-gradient(90deg, #dcefed, #95beb9, #5f989a, #275f68);
+    }
+
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      color: var(--soft);
+      font-size: 0.7rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
+
+    .metric {
+      border: 1px solid rgba(23, 25, 29, 0.12);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.55);
+      padding: 7px;
+      min-width: 0;
+    }
+
+    .metric-value {
+      color: #153f46;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.05;
+    }
+
+    .metric-label {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.2;
     }
 
     .detail {
-      border-top: 1px solid var(--line);
-      margin-top: 12px;
-      padding-top: 12px;
       display: grid;
-      gap: 8px;
+      gap: 4px;
+      margin-top: 8px;
     }
 
     .detail-line {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      font-size: 13px;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.22;
     }
 
-    .detail-line span:first-child { color: var(--muted); }
+    .detail-line strong {
+      color: var(--ink);
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .mini-chart svg {
+      display: block;
+      width: 100%;
+      height: 172px;
+      border: 1px solid rgba(23, 25, 29, 0.12);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.4);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 108px;
+      max-height: 160px;
+      resize: vertical;
+      border: 1px solid rgba(23, 25, 29, 0.14);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.62);
+      color: var(--muted);
+      padding: 9px 10px;
+      font-size: 0.76rem;
+      line-height: 1.34;
+    }
+
+    .copy-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 7px;
+    }
+
+    .copy-row button {
+      min-height: 30px;
+      padding: 0 10px;
+      color: #343940;
+      font-size: 0.74rem;
+    }
+
+    .data-sources ul,
+    .source-note ul {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .data-sources li,
+    .source-note li {
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.32;
+    }
+
+    .data-sources a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .map-stage {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      background: var(--map-bg);
+    }
+
+    #map {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-toolbar {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 2;
+      display: flex;
+      gap: 6px;
+    }
+
+    .prep-link,
+    .map-caption {
+      position: absolute;
+      z-index: 2;
+      border: 1px solid rgba(23, 25, 29, 0.14);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, 0.78);
+      color: #4f5865;
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      text-decoration: none;
+    }
+
+    .prep-link {
+      top: 16px;
+      left: 16px;
+    }
+
+    .map-caption {
+      left: 18px;
+      bottom: 24px;
+      max-width: min(720px, calc(100% - 36px));
+      line-height: 1.4;
+    }
+
+    .map-toolbar button {
+      min-width: 68px;
+      padding: 0 10px;
+      background: rgba(251, 250, 246, 0.78);
+      color: #343940;
+      font-size: 0.76rem;
+      box-shadow: none;
+    }
+
+    .maplibregl-ctrl-attrib,
+    .maplibregl-ctrl-logo { display: none !important; }
+
+    .maplibregl-popup-content {
+      border: 1px solid rgba(23, 25, 29, 0.16);
+      border-radius: 4px;
+      background: rgba(251, 250, 246, 0.96);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      font: 0.78rem/1.35 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
     .toast {
       position: fixed;
       right: 18px;
       bottom: 18px;
-      background: var(--teal-dark);
-      color: white;
-      padding: 10px 13px;
-      border-radius: 8px;
+      z-index: 5;
+      border: 1px solid rgba(23, 25, 29, 0.12);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, 0.88);
+      color: #4f5865;
+      padding: 8px 12px;
       opacity: 0;
       transform: translateY(8px);
-      transition: .2s ease;
+      transition: .18s ease;
       pointer-events: none;
-      box-shadow: var(--shadow);
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 0.76rem;
     }
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    @media (max-width: 1120px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-      .direction-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-      .layout, .chart-grid { grid-template-columns: 1fr; }
-      .insight { position: static; }
-    }
+    @media (max-width: 860px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(430px, 54vh) 1fr;
+        min-height: 100vh;
+      }
 
-    @media (max-width: 720px) {
-      main { padding: 14px; }
-      .sidebar { padding: 14px 10px; }
-      .topbar { display: grid; }
-      .actions { justify-content: flex-start; }
-      .direction-list, .grid-2, .grid-3 { grid-template-columns: 1fr; }
-      .county-row { grid-template-columns: 90px 1fr 45px; }
-      .chart-box { min-height: 300px; }
+      .panel {
+        order: 2;
+        max-height: none;
+        border-top: 1px solid var(--line);
+        border-right: 0;
+        padding: 22px 18px;
+      }
+
+      .map-stage { order: 1; }
+      .map-toolbar { top: 12px; right: 12px; }
+      .map-caption { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="mark">E</div>
-        <div>
-          <h1>EpiMap</h1>
-          <div class="small">King County census tract 真实数据探索</div>
+  <main class="app-shell">
+    <aside class="panel" aria-label="Research controls">
+      <header class="brand">
+        <h1>EpiMap: King County Tract Explorer</h1>
+        <p class="lede">
+          A research map for studying chronic disease, mental health, respiratory vulnerability, and neighborhood-level health equity across King County census tracts.
+        </p>
+      </header>
+
+      <section class="control-group" aria-label="Research module">
+        <h2>Research Module</h2>
+        <div id="directionList" class="segmented"></div>
+      </section>
+
+      <section class="question" aria-live="polite">
+        <p class="question-label">Research Question</p>
+        <p id="hypothesis"></p>
+      </section>
+
+      <section class="control-group" aria-label="Map layer">
+        <h2>Map Layer</h2>
+        <label for="outcomeSelect">Indicator</label>
+        <select id="outcomeSelect"></select>
+        <div style="height:8px"></div>
+        <label for="exposureSelect">Comparison Variable</label>
+        <select id="exposureSelect"></select>
+      </section>
+
+      <section class="evidence" aria-label="Evidence indicators">
+        <h2>Evidence Indicators</h2>
+        <div id="tags" class="tag-row"></div>
+      </section>
+
+      <section class="legend-block" aria-label="Legend">
+        <div class="legend-head">
+          <h2 id="legendTitle">Legend</h2>
+          <span class="small" id="dataBadge"></span>
         </div>
-      </div>
-      <div class="nav-title">流行病学方向</div>
-      <div id="directionList" class="direction-list"></div>
-      <div class="nav-title">数据说明</div>
-      <div class="side-card">
-        <div><strong>默认对象：</strong>King County tract</div>
-        <div><strong>对比样本：</strong>King County 494 个 census tracts</div>
-        <div><strong>健康指标：</strong>CDC PLACES 2025 tract release</div>
-        <div><strong>人口变量：</strong>Census Reporter 最新 ACS 5-year</div>
-      </div>
+        <div class="legend-ramp"></div>
+        <div class="legend-labels">
+          <span id="legendMin">Lower</span>
+          <span id="legendMax">Higher</span>
+        </div>
+      </section>
+
+      <section class="tract-stats" aria-label="Selected tract statistics">
+        <h2>Selected Tract</h2>
+        <div class="metric-grid">
+          <div class="metric"><div id="kingMetric" class="metric-value"></div><div class="metric-label">Selected tract</div></div>
+          <div class="metric"><div id="rankMetric" class="metric-value"></div><div class="metric-label">Tract rank</div></div>
+          <div class="metric"><div id="corrMetric" class="metric-value"></div><div class="metric-label">Pearson r</div></div>
+        </div>
+        <div id="detail" class="detail"></div>
+      </section>
+
+      <section class="mini-chart" aria-label="Evidence scatterplot">
+        <h2 id="scatterTitle">Evidence Scatterplot</h2>
+        <svg id="scatter" viewBox="0 0 540 332" role="img" aria-label="King County census tract scatterplot"></svg>
+      </section>
+
+      <section class="source-note" aria-label="Interpretation note">
+        <h2>Interpretation Note</h2>
+        <textarea id="interpretation"></textarea>
+        <div class="copy-row">
+          <button id="copyBtn" type="button">Copy Note</button>
+          <button id="resetBtn" type="button">Reset</button>
+        </div>
+      </section>
+
+      <section class="source-note" aria-label="Next steps">
+        <h2>Next Analysis</h2>
+        <ul id="nextSteps"></ul>
+      </section>
+
+      <section class="data-sources" aria-label="Data sources">
+        <h2>Data Sources</h2>
+        <ul id="sources"></ul>
+      </section>
+
+      <section class="tract-stats" aria-label="County context">
+        <h2>County Context</h2>
+        <div class="metric-grid">
+          <div class="metric"><div id="popMetric" class="metric-value"></div><div class="metric-label">Population</div></div>
+          <div class="metric"><div id="povertyMetric" class="metric-value"></div><div class="metric-label">Poverty</div></div>
+          <div class="metric"><div id="educationMetric" class="metric-value"></div><div class="metric-label">Less than HS</div></div>
+        </div>
+      </section>
     </aside>
 
-    <main>
-      <div class="topbar">
-        <div>
-          <h2 id="title"></h2>
-          <div id="subtitle" class="small"></div>
-        </div>
-        <div class="actions">
-          <button class="btn" id="resetBtn" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.34-5.66M4 5v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            重置
-          </button>
-          <button class="btn primary" id="copyBtn" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            复制解释
-          </button>
-        </div>
+    <section class="map-stage" aria-label="Interactive King County tract map">
+      <div id="map"></div>
+      <a class="prep-link" href="https://data.cdc.gov/resource/yjkw-uj5s" target="_blank" rel="noreferrer">CDC PLACES Tract Data</a>
+      <div class="map-toolbar">
+        <button type="button" id="resetView">Reset</button>
+        <button type="button" id="toggleBorders" aria-pressed="true">Borders</button>
       </div>
-
-      <div class="layout">
-        <section class="stack">
-          <div class="panel">
-            <div class="panel-head">
-              <p class="panel-title">研究问题生成器</p>
-              <span id="dataBadge" class="tag"></span>
-            </div>
-            <div class="panel-body">
-              <div class="grid-2">
-                <div>
-                  <label for="outcomeSelect">结果变量 Y</label>
-                  <select id="outcomeSelect"></select>
-                </div>
-                <div>
-                  <label for="exposureSelect">解释变量 X</label>
-                  <select id="exposureSelect"></select>
-                </div>
-              </div>
-              <div id="hypothesis" class="hypothesis"></div>
-              <div id="tags" class="tag-row"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <p class="panel-title">真实数据探索视图</p>
-              <span class="small">点击 tract 可切换对比对象；地图显示 King County 内部差异</span>
-            </div>
-            <div class="panel-body">
-              <div class="chart-grid">
-                <div class="chart-box">
-                  <div class="chart-title" id="mapTitle">MapLibre tract-level 专题图</div>
-                  <div id="map"></div>
-                  <div class="map-legend">
-                    <div class="small" id="legendTitle"></div>
-                    <div class="legend-ramp"></div>
-                    <div class="legend-labels"><span id="legendMin"></span><span id="legendMax"></span></div>
-                  </div>
-                </div>
-                <div class="chart-box">
-                  <div class="chart-title" id="scatterTitle"></div>
-                  <svg id="scatter" viewBox="0 0 540 332" role="img" aria-label="King County census tract scatterplot"></svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <p class="panel-title">King County 真实快照</p>
-              <span class="small" id="retrieved"></span>
-            </div>
-            <div class="panel-body">
-              <div class="grid-3">
-                <div class="metric"><div id="popMetric" class="metric-value"></div><div class="metric-label">ACS population</div></div>
-                <div class="metric"><div id="povertyMetric" class="metric-value"></div><div class="metric-label">Below poverty</div></div>
-                <div class="metric"><div id="educationMetric" class="metric-value"></div><div class="metric-label">Less than high school</div></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <p class="panel-title">数据源</p>
-              <span class="small">GitHub 同步时这些数据已随项目缓存</span>
-            </div>
-            <div class="panel-body">
-              <ul id="sources" class="source-list"></ul>
-            </div>
-          </div>
-        </section>
-
-        <aside class="panel insight">
-          <div class="panel-head">
-            <p class="panel-title">解释与论文话术</p>
-          </div>
-          <div class="panel-body">
-            <div class="grid-3">
-              <div class="metric"><div id="kingMetric" class="metric-value"></div><div class="metric-label">Selected tract</div></div>
-              <div class="metric"><div id="rankMetric" class="metric-value"></div><div class="metric-label">Tract rank</div></div>
-              <div class="metric"><div id="corrMetric" class="metric-value"></div><div class="metric-label">Pearson r</div></div>
-            </div>
-            <div style="height:14px"></div>
-            <label for="interpretation">可直接改写的解释草稿</label>
-            <textarea id="interpretation"></textarea>
-            <div id="detail" class="detail"></div>
-            <div style="height:14px"></div>
-            <p class="panel-title">下一步分析</p>
-            <ul id="nextSteps" class="next-list" style="margin-top:8px"></ul>
-          </div>
-        </aside>
+      <div class="map-caption">
+        <span id="title">King County Census Tract Health Explorer</span>
+        <span aria-hidden="true"> · </span>
+        <span id="subtitle">CDC PLACES model-based tract estimates, 2025 release.</span>
+        <span aria-hidden="true"> · </span>
+        <span id="retrieved"></span>
       </div>
-    </main>
-  </div>
-  <div id="toast" class="toast">已复制</div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">Copied</div>
   <script src="./data/king-tract-data.js"></script>
   <script src="./data/king-tracts-2023.js"></script>
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
