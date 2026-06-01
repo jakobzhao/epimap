@@ -492,5 +492,13 @@ $("toggleBorders").addEventListener("click", event => {
   event.currentTarget.setAttribute("aria-pressed", String(bordersVisible));
 });
 
+$("welcomeClose").addEventListener("click", () => {
+  $("welcomePanel").hidden = true;
+});
+
+$("welcomeBtn").addEventListener("click", () => {
+  $("welcomePanel").hidden = false;
+});
+
 state.selectedTract = topTract(state.outcome).tractfips;
 render();
