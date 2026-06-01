@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EpiMap | King County Epidemiology Explorer</title>
+  <title>EpiMap | King County Tract Explorer</title>
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     :root {
@@ -459,16 +459,16 @@
         <div class="mark">E</div>
         <div>
           <h1>EpiMap</h1>
-          <div class="small">King County, WA 真实数据探索</div>
+          <div class="small">King County census tract 真实数据探索</div>
         </div>
       </div>
       <div class="nav-title">流行病学方向</div>
       <div id="directionList" class="direction-list"></div>
       <div class="nav-title">数据说明</div>
       <div class="side-card">
-        <div><strong>默认对象：</strong>King County, WA</div>
-        <div><strong>对比样本：</strong>Washington 39 个县</div>
-        <div><strong>健康指标：</strong>CDC PLACES 2025 county release</div>
+        <div><strong>默认对象：</strong>King County tract</div>
+        <div><strong>对比样本：</strong>King County 494 个 census tracts</div>
+        <div><strong>健康指标：</strong>CDC PLACES 2025 tract release</div>
         <div><strong>人口变量：</strong>Census Reporter 最新 ACS 5-year</div>
       </div>
     </aside>
@@ -517,12 +517,12 @@
           <div class="panel">
             <div class="panel-head">
               <p class="panel-title">真实数据探索视图</p>
-              <span class="small">点击左侧县名可切换对比对象；King County 默认高亮</span>
+              <span class="small">点击 tract 可切换对比对象；地图显示 King County 内部差异</span>
             </div>
             <div class="panel-body">
               <div class="chart-grid">
                 <div class="chart-box">
-                  <div class="chart-title" id="mapTitle">MapLibre 县级专题图</div>
+                  <div class="chart-title" id="mapTitle">MapLibre tract-level 专题图</div>
                   <div id="map"></div>
                   <div class="map-legend">
                     <div class="small" id="legendTitle"></div>
@@ -532,7 +532,7 @@
                 </div>
                 <div class="chart-box">
                   <div class="chart-title" id="scatterTitle"></div>
-                  <svg id="scatter" viewBox="0 0 540 332" role="img" aria-label="Washington county scatterplot"></svg>
+                  <svg id="scatter" viewBox="0 0 540 332" role="img" aria-label="King County census tract scatterplot"></svg>
                 </div>
               </div>
             </div>
@@ -569,8 +569,8 @@
           </div>
           <div class="panel-body">
             <div class="grid-3">
-              <div class="metric"><div id="kingMetric" class="metric-value"></div><div class="metric-label">King County</div></div>
-              <div class="metric"><div id="rankMetric" class="metric-value"></div><div class="metric-label">WA rank</div></div>
+              <div class="metric"><div id="kingMetric" class="metric-value"></div><div class="metric-label">Selected tract</div></div>
+              <div class="metric"><div id="rankMetric" class="metric-value"></div><div class="metric-label">Tract rank</div></div>
               <div class="metric"><div id="corrMetric" class="metric-value"></div><div class="metric-label">Pearson r</div></div>
             </div>
             <div style="height:14px"></div>
@@ -586,8 +586,8 @@
     </main>
   </div>
   <div id="toast" class="toast">已复制</div>
-  <script src="./data/king-wa-data.js"></script>
-  <script src="./data/wa-counties-2023.js"></script>
+  <script src="./data/king-tract-data.js"></script>
+  <script src="./data/king-tracts-2023.js"></script>
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
   <script src="./src/app.js"></script>
 </body>

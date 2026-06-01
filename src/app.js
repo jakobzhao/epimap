@@ -1,7 +1,7 @@
-const data = window.EPIMAP_DATA;
+const data = window.EPIMAP_TRACT_DATA;
 const rows = data.places.rows;
 const kingCensus = data.kingCensus;
-const KING_FIPS = "53033";
+const DEFAULT_TRACT = "53033000101";
 
 const measures = {
   access2_crudeprev: "Uninsured adults 18-64 (%)",
@@ -27,53 +27,53 @@ const directions = [
     id: "environment",
     icon: "air",
     name: "环境暴露与慢性病风险",
-    short: "用真实健康数据先做 King County 可行性探索",
-    title: "King County 的环境健康选题可以如何落地？",
-    subtitle: "当前版本使用 CDC PLACES 的真实县级健康指标；PM2.5、绿地、热暴露可作为下一步外部数据接入。",
-    badge: "CDC PLACES 真实数据",
+    short: "先用 tract 健康差异定位候选社区",
+    title: "King County 哪些 tract 更适合做环境健康研究？",
+    subtitle: "CDC PLACES tract 数据能先定位哮喘/COPD/心血管风险的空间差异，再接入 PM2.5、绿地、道路或热暴露。",
+    badge: "tract-level pilot",
     outcomes: ["casthma_crudeprev", "copd_crudeprev", "chd_crudeprev"],
     exposures: ["csmoking_crudeprev", "lpa_crudeprev", "ghlth_crudeprev"],
-    tags: ["King County", "WA counties", "生态分析", "环境数据待接入"],
-    caveat: "这里的 X 是健康/行为代理变量，不是直接环境暴露；正式论文应接入 EPA/NOAA/绿地数据。",
+    tags: ["census tract", "CDC PLACES", "MapLibre", "环境数据下一步"],
+    caveat: "当前 X 是健康/行为代理变量，不是直接环境暴露；正式论文应接入 EPA、NOAA、道路、绿地或树冠覆盖等 tract/栅格数据。",
     next: [
-      "把 EPA PM2.5 或 NOAA heat days 加入县级表，替换当前代理变量。",
-      "先写成 feasibility pilot：King County 在 WA 县中的疾病负担处于什么位置。",
-      "加入 Seattle/King County 内部 census tract 数据后，可以转向更细尺度的空间不平等问题。"
+      "把 PM2.5、NOAA heat days、tree canopy 或 major road proximity 加到 tract 表。",
+      "寻找高哮喘或高 COPD 的 tract 集群，作为环境暴露假设的重点区域。",
+      "Methods 里明确 PLACES tract values 是 small-area model-based estimates。"
     ]
   },
   {
     id: "svi",
     icon: "layers",
     name: "社会脆弱性与健康不平等",
-    short: "未保险、贫困、教育与疾病差异",
-    title: "King County 的健康不平等如何解释？",
-    subtitle: "用未保险、贫困、教育和健康结果做第一版社会脆弱性解释，再接入正式 SVI。",
-    badge: "适合开题",
+    short: "King County 内部 tract 差异最适合这个方向",
+    title: "King County 内部健康不平等是否存在 tract-level 空间差异？",
+    subtitle: "用未保险、运动不足、残障、糖尿病、总体健康等指标，先构建 tract-level health inequity story。",
+    badge: "最适合 tract",
     outcomes: ["diabetes_crudeprev", "ghlth_crudeprev", "phlth_crudeprev"],
     exposures: ["access2_crudeprev", "lpa_crudeprev", "disability_crudeprev"],
-    tags: ["health equity", "CDC PLACES", "ACS", "SVI next"],
-    caveat: "正式 SVI 是 CDC/ATSDR 单独数据集；当前页面先用可解释的 PLACES/ACS 指标搭研究框架。",
+    tags: ["health equity", "tract rank", "ACS/SVI next", "生态研究"],
+    caveat: "当前页面还没有接入 CDC/ATSDR SVI 或 ACS tract poverty/education；它先用 PLACES 内部变量建立研究问题。",
     next: [
-      "把 CDC/ATSDR SVI county 或 tract 数据接入，检验 SVI 与健康结果的关系。",
-      "对 King County 做 WA rank，再讨论它是否属于低风险但内部差异大的县。",
-      "避免个体层面推断，论文中明确 ecological study limitation。"
+      "接入 CDC/ATSDR SVI tract 数据，检验 SVI 与健康结果之间的空间关系。",
+      "对高风险 tract 做分位数地图，说明 King County 并非内部均质。",
+      "论文里强调 ecological fallacy，不能把 tract 差异解释为个体差异。"
     ]
   },
   {
     id: "heat",
     icon: "thermo",
     name: "极端高温与健康风险",
-    short: "高温脆弱性、心血管、老年风险",
-    title: "热健康风险能否用 King County 做 pilot？",
-    subtitle: "用心血管、慢病和脆弱性指标先构建 heat-health vulnerability 的健康侧，再接入 NOAA 热暴露。",
+    short: "热暴露 + tract 慢病脆弱性",
+    title: "King County 哪些 tract 可能更容易受到热健康风险影响？",
+    subtitle: "先用心血管、血压、残障和总体健康指标描述健康脆弱性，再接 NOAA 或城市热岛数据。",
     badge: "气候健康方向",
     outcomes: ["chd_crudeprev", "bphigh_crudeprev", "stroke_crudeprev"],
     exposures: ["disability_crudeprev", "ghlth_crudeprev", "phlth_crudeprev"],
-    tags: ["climate health", "heat vulnerability", "NOAA next", "risk index"],
-    caveat: "CDC PLACES 给的是健康脆弱性，不是温度暴露；热浪天数需要 NOAA 或 CDC Tracking Network。",
+    tags: ["heat vulnerability", "chronic disease", "NOAA next", "risk index"],
+    caveat: "PLACES 给的是健康脆弱性，不是温度暴露；热浪天数、地表温度或树冠覆盖要作为外部数据层接入。",
     next: [
-      "建立 heat-health vulnerability index：热暴露 + 慢性病 + 老龄化/贫困。",
-      "接入 NOAA daily maximum temperature，计算 summer extreme heat days。",
+      "构建 heat-health vulnerability index：慢病负担 + disability + old age/poverty + heat exposure。",
+      "接入 NOAA daily maximum temperature 或 Landsat land surface temperature。",
       "解释上连接 cooling centers、城市绿化和热预警。"
     ]
   },
@@ -81,36 +81,36 @@ const directions = [
     id: "respiratory",
     icon: "network",
     name: "传染病/呼吸道疾病空间传播",
-    short: "呼吸道脆弱性，而不是简单 COVID 复述",
-    title: "King County 的呼吸道疾病脆弱性如何表达？",
-    subtitle: "先用哮喘、COPD、吸烟、未保险构建 respiratory vulnerability，再视情况接入 flu/COVID/wastewater。",
+    short: "做 respiratory vulnerability，而不是传播预测",
+    title: "King County 内部 respiratory vulnerability 在哪些 tract 更高？",
+    subtitle: "用哮喘、COPD、吸烟、未保险、睡眠不足等指标构建呼吸道疾病脆弱性图谱。",
     badge: "需要收窄",
     outcomes: ["casthma_crudeprev", "copd_crudeprev", "ghlth_crudeprev"],
     exposures: ["csmoking_crudeprev", "access2_crudeprev", "sleep_crudeprev"],
-    tags: ["respiratory", "vulnerability", "CDC", "wastewater next"],
-    caveat: "PLACES 不代表实时传播；当前页面适合做脆弱性，不适合声称传播路径。",
+    tags: ["respiratory", "vulnerability", "tract map", "wastewater next"],
+    caveat: "PLACES 不是实时感染监测数据；当前页面适合研究脆弱性，不适合声称疾病传播路径。",
     next: [
-      "把题目写成 post-pandemic respiratory vulnerability，而不是预测传播。",
-      "加入 CDC respiratory illness 或 WA wastewater 数据作为外部时间序列。",
-      "用人口密度、通勤或 household crowding 解释潜在接触机会。"
+      "把题目写成 post-pandemic respiratory vulnerability，而不是 COVID spread prediction。",
+      "如果要加入传播维度，可接 wastewater、flu/COVID surveillance 或通勤/人口密度。",
+      "比较高哮喘和高未保险 tract，讨论医疗可及性。"
     ]
   },
   {
     id: "mental",
     icon: "pulse",
     name: "青少年心理健康地理差异",
-    short: "心理健康、睡眠、运动不足",
-    title: "King County 的心理健康方向能否成文？",
-    subtitle: "用 frequent mental distress、depression、sleep、physical inactivity 做县级探索；青少年题目需再接 YRBS。",
-    badge: "叙事贴近 Cindy",
+    short: "当前 PLACES 是成人估计，YRBS 可作下一步",
+    title: "King County 心理健康和睡眠不足是否有 tract-level 空间差异？",
+    subtitle: "用 frequent mental distress、depression、short sleep 和运动不足先做社区心理健康探索。",
+    badge: "叙事贴近",
     outcomes: ["mhlth_crudeprev", "depression_crudeprev", "sleep_crudeprev"],
     exposures: ["sleep_crudeprev", "lpa_crudeprev", "ghlth_crudeprev"],
     tags: ["mental health", "sleep", "behavioral health", "YRBS next"],
-    caveat: "PLACES 是成年人县级估计；如果题目强调青少年，需要接 CDC YRBS 或地方学校数据。",
+    caveat: "CDC PLACES tract 指标主要是成人 model-based estimates；如果题目坚持青少年，需要接 CDC YRBS 或本地学校/青少年调查数据。",
     next: [
-      "把当前版本作为 adults/community mental health pilot。",
-      "如果 Cindy 想写青少年，下一步改用 YRBS 指标并谨慎处理隐私与伦理表述。",
-      "讨论睡眠、运动不足和心理健康之间的空间共现，而不是个体诊断。"
+      "先把题目表述为 community mental health geography。",
+      "若 Cindy 想强调青少年，下一步查 YRBS 是否有可用的 King County 或 WA 子区域数据。",
+      "讨论睡眠、运动不足和 mental distress 的空间共现，而不是做个体诊断。"
     ]
   }
 ];
@@ -119,7 +119,7 @@ let state = {
   direction: directions[0],
   outcome: directions[0].outcomes[0],
   exposure: directions[0].exposures[0],
-  selectedFips: KING_FIPS
+  selectedTract: DEFAULT_TRACT
 };
 
 const $ = (id) => document.getElementById(id);
@@ -139,6 +139,16 @@ function icon(type) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[type]}</svg>`;
 }
 
+function fmt(value, digits = 1) {
+  return Number.isFinite(value) ? value.toFixed(digits) : "NA";
+}
+
+function tractLabel(rowOrFips) {
+  const fips = typeof rowOrFips === "string" ? rowOrFips : rowOrFips.tractfips;
+  const feature = window.KING_TRACTS_GEOJSON.features.find(item => item.properties.GEOID === fips);
+  return feature ? feature.properties.NAMELSAD : `Tract ${fips.slice(-6)}`;
+}
+
 function pearson(items, xKey, yKey) {
   const pairs = items.map(r => [r[xKey], r[yKey]]).filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
   const n = pairs.length;
@@ -152,21 +162,27 @@ function pearson(items, xKey, yKey) {
   return num / (denX * denY);
 }
 
-function rankFor(items, key, fips) {
-  const sorted = items.slice().sort((a, b) => b[key] - a[key]);
-  return sorted.findIndex(r => r.countyfips === fips) + 1;
+function avg(key) {
+  const vals = rows.map(row => row[key]).filter(Number.isFinite);
+  return vals.reduce((sum, value) => sum + value, 0) / vals.length;
+}
+
+function rankFor(key, tractFips) {
+  const sorted = rows.slice().sort((a, b) => b[key] - a[key]);
+  return sorted.findIndex(row => row.tractfips === tractFips) + 1;
+}
+
+function quantileRank(key, tractFips) {
+  const rank = rankFor(key, tractFips);
+  return Math.ceil(rank / rows.length * 100);
 }
 
 function selectedRow() {
-  return rows.find(r => r.countyfips === state.selectedFips) || rows.find(r => r.countyfips === KING_FIPS);
+  return rows.find(row => row.tractfips === state.selectedTract) || rows.find(row => row.tractfips === DEFAULT_TRACT) || rows[0];
 }
 
-function kingRow() {
-  return rows.find(r => r.countyfips === KING_FIPS);
-}
-
-function fmt(value, digits = 1) {
-  return Number.isFinite(value) ? value.toFixed(digits) : "NA";
+function topTract(key) {
+  return rows.slice().sort((a, b) => b[key] - a[key])[0];
 }
 
 function renderNav() {
@@ -179,11 +195,12 @@ function renderNav() {
   document.querySelectorAll(".direction").forEach(btn => {
     btn.addEventListener("click", () => {
       const direction = directions.find(d => d.id === btn.dataset.id);
+      const firstHigh = topTract(direction.outcomes[0]);
       state = {
         direction,
         outcome: direction.outcomes[0],
         exposure: direction.exposures[0],
-        selectedFips: KING_FIPS
+        selectedTract: firstHigh.tractfips
       };
       render();
     });
@@ -193,33 +210,34 @@ function renderNav() {
 function renderSelects() {
   $("outcomeSelect").innerHTML = state.direction.outcomes.map(key => `<option value="${key}" ${key === state.outcome ? "selected" : ""}>${measures[key]}</option>`).join("");
   $("exposureSelect").innerHTML = state.direction.exposures.map(key => `<option value="${key}" ${key === state.exposure ? "selected" : ""}>${measures[key]}</option>`).join("");
-  $("outcomeSelect").onchange = (event) => { state.outcome = event.target.value; render(); };
-  $("exposureSelect").onchange = (event) => { state.exposure = event.target.value; render(); };
+  $("outcomeSelect").onchange = event => {
+    state.outcome = event.target.value;
+    state.selectedTract = topTract(state.outcome).tractfips;
+    render();
+  };
+  $("exposureSelect").onchange = event => {
+    state.exposure = event.target.value;
+    render();
+  };
 }
 
 function mapData() {
-  const byFips = new Map(rows.map(row => [row.countyfips, row]));
+  const byTract = new Map(rows.map(row => [row.tractfips, row]));
   return {
-    ...window.WA_COUNTIES_GEOJSON,
-    features: window.WA_COUNTIES_GEOJSON.features.map(feature => {
-      const row = byFips.get(feature.properties.GEOID);
+    ...window.KING_TRACTS_GEOJSON,
+    features: window.KING_TRACTS_GEOJSON.features.map(feature => {
+      const row = byTract.get(feature.properties.GEOID);
       return {
         ...feature,
         properties: {
           ...feature.properties,
           value: row ? row[state.outcome] : null,
           exposure: row ? row[state.exposure] : null,
-          selected: feature.properties.GEOID === state.selectedFips,
-          isKing: feature.properties.GEOID === KING_FIPS
+          selected: feature.properties.GEOID === state.selectedTract
         }
       };
     })
   };
-}
-
-function mapBreaks() {
-  const values = rows.map(row => row[state.outcome]).filter(Number.isFinite);
-  return { min: Math.min(...values), max: Math.max(...values) };
 }
 
 function initMap() {
@@ -238,62 +256,52 @@ function initMap() {
       },
       layers: [{ id: "osm", type: "raster", source: "osm" }]
     },
-    center: [-120.8, 47.35],
-    zoom: 5.55,
-    minZoom: 4.6,
-    maxZoom: 9,
+    center: [-122.19, 47.48],
+    zoom: 8.15,
+    minZoom: 7.25,
+    maxZoom: 12,
     cooperativeGestures: true
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
   popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false });
   map.on("load", () => {
     mapLoaded = true;
-    const breaks = mapBreaks();
-    map.addSource("wa-counties", { type: "geojson", data: mapData() });
+    map.addSource("king-tracts", { type: "geojson", data: mapData() });
     map.addLayer({
-      id: "county-fill",
+      id: "tract-fill",
       type: "fill",
-      source: "wa-counties",
+      source: "king-tracts",
       paint: {
-        "fill-color": ["case",
-          ["==", ["get", "selected"], true], "#d99116",
-          ["interpolate", ["linear"], ["get", "value"],
-            breaks.min, "#dcefed",
-            (breaks.min + breaks.max) / 2, "#0f766e",
-            breaks.max, "#134e4a"
-          ]
-        ],
-        "fill-opacity": ["case", ["==", ["get", "selected"], true], 0.88, 0.68]
+        "fill-color": "#0f766e",
+        "fill-opacity": ["case", ["==", ["get", "selected"], true], 0.9, 0.68]
       }
     });
     map.addLayer({
-      id: "county-line",
+      id: "tract-line",
       type: "line",
-      source: "wa-counties",
+      source: "king-tracts",
       paint: {
-        "line-color": ["case", ["==", ["get", "selected"], true], "#8a520b", ["==", ["get", "isKing"], true], "#ba5656", "#ffffff"],
-        "line-width": ["case", ["==", ["get", "selected"], true], 2.5, ["==", ["get", "isKing"], true], 2, 0.8]
+        "line-color": ["case", ["==", ["get", "selected"], true], "#8a520b", "#ffffff"],
+        "line-width": ["case", ["==", ["get", "selected"], true], 2.3, 0.55]
       }
     });
-    map.on("mousemove", "county-fill", event => {
+    map.on("mousemove", "tract-fill", event => {
       map.getCanvas().style.cursor = "pointer";
       const feature = event.features && event.features[0];
       if (!feature) return;
-      const value = feature.properties.value;
-      const exposure = feature.properties.exposure;
       popup
         .setLngLat(event.lngLat)
-        .setHTML(`<strong>${feature.properties.NAMELSAD}</strong><br>${measures[state.outcome]}: ${fmt(Number(value))}%<br>${measures[state.exposure]}: ${fmt(Number(exposure))}%`)
+        .setHTML(`<strong>${feature.properties.NAMELSAD}</strong><br>${measures[state.outcome]}: ${fmt(Number(feature.properties.value))}%<br>${measures[state.exposure]}: ${fmt(Number(feature.properties.exposure))}%`)
         .addTo(map);
     });
-    map.on("mouseleave", "county-fill", () => {
+    map.on("mouseleave", "tract-fill", () => {
       map.getCanvas().style.cursor = "";
       popup.remove();
     });
-    map.on("click", "county-fill", event => {
+    map.on("click", "tract-fill", event => {
       const feature = event.features && event.features[0];
       if (feature) {
-        state.selectedFips = feature.properties.GEOID;
+        state.selectedTract = feature.properties.GEOID;
         render();
       }
     });
@@ -310,8 +318,8 @@ function updateMap() {
   $("legendMin").textContent = `${fmt(min)}%`;
   $("legendMax").textContent = `${fmt(max)}%`;
   if (!mapLoaded) return;
-  map.getSource("wa-counties").setData(mapData());
-  map.setPaintProperty("county-fill", "fill-color", ["case",
+  map.getSource("king-tracts").setData(mapData());
+  map.setPaintProperty("tract-fill", "fill-color", ["case",
     ["==", ["get", "selected"], true], "#d99116",
     ["interpolate", ["linear"], ["get", "value"],
       min, "#dcefed",
@@ -344,13 +352,9 @@ function renderScatter() {
   const lineY1 = intercept + slope * xMin;
   const lineY2 = intercept + slope * xMax;
   const selected = selectedRow();
-  const king = kingRow();
   const points = rows.map(row => {
-    const isSelected = row.countyfips === state.selectedFips;
-    const isKing = row.countyfips === KING_FIPS;
-    const fill = isSelected ? "#d99116" : isKing ? "#ba5656" : "#0f766e";
-    const radius = isSelected ? 6 : isKing ? 5 : 4;
-    return `<circle cx="${x(row[state.exposure]).toFixed(1)}" cy="${y(row[state.outcome]).toFixed(1)}" r="${radius}" fill="${fill}" opacity="${isSelected || isKing ? 1 : .68}"><title>${row.countyname}</title></circle>`;
+    const active = row.tractfips === state.selectedTract;
+    return `<circle cx="${x(row[state.exposure]).toFixed(1)}" cy="${y(row[state.outcome]).toFixed(1)}" r="${active ? 6 : 3.2}" fill="${active ? "#d99116" : "#0f766e"}" opacity="${active ? 1 : .55}"><title>${tractLabel(row)}</title></circle>`;
   }).join("");
   svg.innerHTML = `
     <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"/>
@@ -365,57 +369,55 @@ function renderScatter() {
     ${points}
     <text x="${pad.left}" y="${height - 16}" fill="#617174" font-size="12">${measures[state.exposure]}</text>
     <text x="15" y="${pad.top + 10}" fill="#617174" font-size="12" transform="rotate(-90 15 ${pad.top + 10})">${measures[state.outcome]}</text>
-    <text x="${x(selected[state.exposure]) + 9}" y="${y(selected[state.outcome]) - 8}" fill="#122528" font-size="12" font-weight="800">${selected.countyname}</text>
-    ${state.selectedFips !== KING_FIPS ? `<text x="${x(king[state.exposure]) + 9}" y="${y(king[state.outcome]) + 16}" fill="#ba5656" font-size="12" font-weight="800">King</text>` : ""}
+    <text x="${Math.min(width - 115, x(selected[state.exposure]) + 9)}" y="${Math.max(18, y(selected[state.outcome]) - 8)}" fill="#122528" font-size="12" font-weight="800">${tractLabel(selected).replace("Census ", "")}</text>
   `;
   $("scatterTitle").textContent = `${measures[state.exposure]} vs. ${measures[state.outcome]}`;
 }
 
 function renderMetrics() {
   const selected = selectedRow();
-  const king = kingRow();
-  const rank = rankFor(rows, state.outcome, KING_FIPS);
+  const rank = rankFor(state.outcome, selected.tractfips);
   const r = pearson(rows, state.exposure, state.outcome);
-  $("kingMetric").textContent = `${fmt(king[state.outcome])}%`;
-  $("rankMetric").textContent = `${rank}/39`;
+  $("kingMetric").textContent = `${fmt(selected[state.outcome])}%`;
+  $("rankMetric").textContent = `${rank}/494`;
   $("corrMetric").textContent = r.toFixed(2);
   $("popMetric").textContent = kingCensus.population.toLocaleString();
   $("povertyMetric").textContent = `${kingCensus.poverty_pct}%`;
   $("educationMetric").textContent = `${kingCensus.less_than_high_school_pct}%`;
   $("retrieved").textContent = `Retrieved ${data.places.retrieved_at}`;
   $("detail").innerHTML = `
-    <div class="detail-line"><span>当前对比县</span><strong>${selected.countyname}, WA</strong></div>
+    <div class="detail-line"><span>当前 tract</span><strong>${tractLabel(selected)}</strong></div>
     <div class="detail-line"><span>${measures[state.exposure]}</span><strong>${fmt(selected[state.exposure])}%</strong></div>
     <div class="detail-line"><span>${measures[state.outcome]}</span><strong>${fmt(selected[state.outcome])}%</strong></div>
-    <div class="detail-line"><span>King County FIPS</span><strong>53033</strong></div>
-    <div class="detail-line"><span>King 45+ min commute</span><strong>${kingCensus.commute_45min_plus_pct}%</strong></div>
+    <div class="detail-line"><span>King County average</span><strong>${fmt(avg(state.outcome))}%</strong></div>
+    <div class="detail-line"><span>Outcome percentile</span><strong>Top ${quantileRank(state.outcome, selected.tractfips)}%</strong></div>
   `;
 }
 
 function renderInterpretation() {
-  const king = kingRow();
-  const rank = rankFor(rows, state.outcome, KING_FIPS);
+  const selected = selectedRow();
+  const rank = rankFor(state.outcome, selected.tractfips);
   const r = pearson(rows, state.exposure, state.outcome);
   const direction = state.direction;
   $("interpretation").value =
 `${direction.name}
 
-研究对象：King County, Washington。对比样本为 Washington 州 39 个县，健康指标来自 CDC PLACES 2025 county release。
+研究对象：King County, Washington 的 494 个 census tracts。健康指标来自 CDC PLACES 2025 census tract GIS-friendly release。
 
-研究问题：在 WA 县级尺度上，${measures[state.exposure]} 是否与 ${measures[state.outcome]} 相关？King County 在这个关系中处于什么位置？
+研究问题：在 King County 内部，${measures[state.exposure]} 是否与 ${measures[state.outcome]} 的 tract-level 空间差异相关？哪些 tract 可以作为高风险或高脆弱性社区的候选案例？
 
-初步发现：King County 的 ${measures[state.outcome]} 为 ${fmt(king[state.outcome])}%，在 WA 39 个县中按高到低排名第 ${rank}。在全州县级横截面中，${measures[state.exposure]} 与 ${measures[state.outcome]} 的 Pearson r 约为 ${r.toFixed(2)}。
+初步发现：当前选中的 ${tractLabel(selected)} 的 ${measures[state.outcome]} 为 ${fmt(selected[state.outcome])}%，在 494 个 King County tracts 中按高到低排名第 ${rank}。King County tract 平均值约为 ${fmt(avg(state.outcome))}%。在 tract-level 横截面中，${measures[state.exposure]} 与 ${measures[state.outcome]} 的 Pearson r 约为 ${r.toFixed(2)}。
 
-解释方式：这说明该方向适合作为 ecological, county-level pilot。它可以帮助 Cindy 先建立研究问题、变量表和图表解释，但不能直接推出个体层面的因果关系。${direction.caveat}`;
+解释方式：这比县级分析更适合 Cindy 的论文，因为它能展示 King County 内部的空间不平等。${direction.caveat}`;
   $("nextSteps").innerHTML = direction.next.map(step => `<li>${step}</li>`).join("");
 }
 
 function renderSources() {
   $("sources").innerHTML = `
-    <li><a href="https://data.cdc.gov/resource/i46a-9kgh" target="_blank" rel="noreferrer">CDC PLACES: County Data, 2025 release</a><div class="small">本项目缓存了 Washington 39 个县的 county-level health estimates。</div></li>
-    <li><a href="https://api.censusreporter.org/" target="_blank" rel="noreferrer">Census Reporter API</a><div class="small">King County population, poverty, education, commute snapshot from latest ACS 5-year tables。</div></li>
-    <li><a href="./data/places-wa-counties-2025.json">本地 CDC 数据缓存</a><div class="small">适合 GitHub 同步和离线演示。</div></li>
-    <li><a href="./data/king-county-census.json">本地 King County ACS 缓存</a><div class="small">用于页面顶部快照与解释面板。</div></li>
+    <li><a href="https://data.cdc.gov/resource/yjkw-uj5s" target="_blank" rel="noreferrer">CDC PLACES: Census Tract Data, 2025 release</a><div class="small">本项目缓存了 King County 494 个 census tracts 的 tract-level health estimates。</div></li>
+    <li><a href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.2023.html" target="_blank" rel="noreferrer">U.S. Census 2023 Cartographic Boundary Files</a><div class="small">Washington census tract KML，页面只保留 King County tracts。</div></li>
+    <li><a href="./data/places-king-tracts-2025.json">本地 CDC tract 数据缓存</a><div class="small">适合 GitHub 同步和离线演示。</div></li>
+    <li><a href="./data/king-tracts-2023.geojson">本地 King County tract GeoJSON</a><div class="small">MapLibre 使用的真实 tract 边界。</div></li>
   `;
 }
 
@@ -425,7 +427,7 @@ function render() {
   $("title").textContent = state.direction.title;
   $("subtitle").textContent = state.direction.subtitle;
   $("dataBadge").textContent = state.direction.badge;
-  $("hypothesis").textContent = `假设：在 Washington 县级尺度上，${measures[state.exposure]} 较高的县，可能也会出现较高的 ${measures[state.outcome]}。King County 可作为重点案例解释。`;
+  $("hypothesis").textContent = `假设：在 King County 的 census tract 尺度上，${measures[state.exposure]} 较高的 tract，可能也会出现较高的 ${measures[state.outcome]}。`;
   $("tags").innerHTML = state.direction.tags.map(tag => `<span class="tag">${tag}</span>`).join("");
   initMap();
   updateMap();
@@ -438,7 +440,7 @@ function render() {
 $("resetBtn").addEventListener("click", () => {
   state.outcome = state.direction.outcomes[0];
   state.exposure = state.direction.exposures[0];
-  state.selectedFips = KING_FIPS;
+  state.selectedTract = topTract(state.outcome).tractfips;
   render();
 });
 
@@ -454,4 +456,5 @@ $("copyBtn").addEventListener("click", async () => {
   window.setTimeout(() => $("toast").classList.remove("show"), 1400);
 });
 
+state.selectedTract = topTract(state.outcome).tractfips;
 render();
