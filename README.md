@@ -1,6 +1,6 @@
 # EpiMap
 
-King County, WA census tract epidemiology direction explorer for Cindy Zhou's research planning.
+King County, WA census tract epidemiology direction explorer for research planning.
 
 ## What it does
 

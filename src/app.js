@@ -109,7 +109,7 @@ const directions = [
     caveat: "CDC PLACES tract 指标主要是成人 model-based estimates；如果题目坚持青少年，需要接 CDC YRBS 或本地学校/青少年调查数据。",
     next: [
       "先把题目表述为 community mental health geography。",
-      "若 Cindy 想强调青少年，下一步查 YRBS 是否有可用的 King County 或 WA 子区域数据。",
+      "若研究题目想强调青少年，下一步查 YRBS 是否有可用的 King County 或 WA 子区域数据。",
       "讨论睡眠、运动不足和 mental distress 的空间共现，而不是做个体诊断。"
     ]
   }
@@ -432,7 +432,7 @@ function renderInterpretation() {
 
 初步发现：当前选中的 ${tractLabel(selected)} 的 ${measures[state.outcome]} 为 ${fmt(selected[state.outcome])}%，在 494 个 King County tracts 中按高到低排名第 ${rank}。King County tract 平均值约为 ${fmt(avg(state.outcome))}%。在 tract-level 横截面中，${measures[state.exposure]} 与 ${measures[state.outcome]} 的 Pearson r 约为 ${r.toFixed(2)}。
 
-解释方式：这比县级分析更适合 Cindy 的论文，因为它能展示 King County 内部的空间不平等。${direction.caveat}`;
+解释方式：这比县级分析更适合 tract-level 公共健康研究，因为它能展示 King County 内部的空间不平等。${direction.caveat}`;
   $("nextSteps").innerHTML = direction.next.map(step => `<li>${step}</li>`).join("");
 }
 
